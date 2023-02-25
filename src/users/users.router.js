@@ -1,21 +1,31 @@
 //* Imports
 const usersServices = require('./users.services');
 const router = require('express').Router();
+const passportJwt = require('../middlewares/auth.middleware');
 
 //* GET all users route
-router.get( '/users', usersServices.getAllUsers );
+router.get( '/', usersServices.getAllUsers );
 
 //* POST new user
-router.post( '/users', usersServices.postNewUser );
+router.post( '/', usersServices.postNewUser );
+
+//* Protected GET my user
+router.get( '/me', passportJwt, usersServices.getMyUser );
+
+//* Protected PATCH my user
+router.patch( '/me', passportJwt, usersServices.patchMyUser );
+
+//* Protected DELETE my user
+router.delete( '/me', passportJwt, usersServices.deleteMyUser );
 
 //* GET user by ID
-router.get( '/users/:id', usersServices.getUserById );
+router.get( '/:id', usersServices.getUserById );
 
 //* UPDATE user
-router.patch( '/users/:id', usersServices.patchUser );
+router.patch( '/:id', passportJwt, usersServices.patchUser );
 
 //* DELETE user
-router.delete( '/users/:id', usersServices.deleteUser );
+router.delete( '/:id', passportJwt, usersServices.deleteUser );
 
 //* Exports
 module.exports = router;

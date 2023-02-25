@@ -15,10 +15,11 @@ const Conversations = db.define( 'conversations', {
     profileImage:{
         type: DataTypes.STRING
     },
+    /*
     createdBy: {
         type: DataTypes.UUID,
         allowNull: false,
-        },
+    },*/
     isGroup: {
         type: DataTypes.BOOLEAN,
         defaultValue: false

@@ -4,6 +4,9 @@ require('dotenv').config();
 
 //* Configurations
 const usersRouter = require('./users/users.router');
+const conversationsRouter = require('./conversations/conversations.router');
+const authRouter = require('./auth/auth.router');
+const passportJwt = require('./middlewares/auth.middleware');
 const responsesHandler = require('./utils/responsesHandler');
 const db = require('./utils/database');
 const initModels = require('./models/initModels');
@@ -43,8 +46,16 @@ app.get( '/', ( req, res ) => {
     });
 });
 
-//* Users router
-app.use( '/api/v1', usersRouter );
+//* Routes
+app.use( '/api/v1/users', usersRouter );
+app.use( '/api/v1/conversations', conversationsRouter );
+app.use( '/api/v1/auth', authRouter );
+
+app.get( '/protected', passportJwt, ( req, res ) => {
+    res.status(200).json({
+        message: "Hola " + req.user.firstName
+    })
+} )
 
 //* Wrong route handling
 app.use( '*', ( req, res ) => {

@@ -1,6 +1,7 @@
 //* Imports
 const usersControllers = require('./users.controllers');
 const responsesHandler = require('../utils/responsesHandler');
+const { hashPassword } = require('../utils/crypto');
 
 //* GET all users
 const getAllUsers = ( req, res ) => {
@@ -21,8 +22,30 @@ const getAllUsers = ( req, res ) => {
                 message: 'There was an error while trying to show all users.'
             });
         });
+    };
+    
+//* GET my user
+const getMyUser = ( req, res ) => {
+    const id = req.user.id;
+    usersControllers.findUserById( id )
+        .then( data => {
+            responsesHandler.successResponse({
+                res,
+                status: 200,
+                data,
+                message: 'Current user information.'
+            }); 
+        })
+        .catch( error => {
+            responsesHandler.errorResponse({
+                res,
+                status: 400,
+                data: error,
+                message: 'There was an error while trying to show your user information.'
+            });
+        });
 };
-
+    
 //* GET user by ID
 const getUserById = ( req, res ) => {
     const id = req.params.id;
@@ -70,12 +93,20 @@ const postNewUser = ( req, res ) => {
                 res,
                 status: 400,
                 data: error,
-                message: 'There was an error while trying to create a new user.'
+                message: 'There was an error while trying to create a new user.',
+                fields: {
+                    firstName: "Firstname",
+                    lastName: "Lastname",
+                    email: "example@gmail.com",
+                    password: "string",
+                    profileImage: "example.com/image.png",
+                    phone: "+57 314XXXXXXX"
+                }
             });
         });
 }
 
-//* UPDATE new user
+//* UPDATE user
 const patchUser = ( req, res ) => {
     const id = req.params.id;
     const userObj = req.body;
@@ -102,6 +133,37 @@ const patchUser = ( req, res ) => {
                 status: 400,
                 data: error,
                 message: 'There was an error while trying to update the desired user.'
+            });
+        });
+};
+
+//* UPDATE my user
+const patchMyUser = ( req, res ) => {
+    const id = req.user.id;
+    const { firstName, lastName, email, password, profileImage, phone } = req.body;
+    const userObj = {
+        firstName,
+        lastName,
+        email,
+        password: hashPassword( password ),
+        profileImage,
+        phone
+    };
+    usersControllers.updateUser( id, userObj )
+        .then( data => {
+            responsesHandler.successResponse({
+                res,
+                status: 200,
+                data,
+                message: 'Personal information updated successfully.'
+            });
+        })
+        .catch( error => {
+            responsesHandler.errorResponse({
+                res,
+                status: 400,
+                data: error,
+                message: 'There was an error while trying to update your personal information.'
             });
         });
 };
@@ -136,11 +198,36 @@ const deleteUser = ( req, res ) => {
         });
 };
 
+//* DELETE my user
+const deleteMyUser = ( req, res ) => {
+    const id = req.user.id;
+    usersControllers.deleteUser( id )
+        .then( data => {
+            responsesHandler.successResponse({
+                res,
+                status: 204,
+                data,
+                message: 'User deleted successfully.'
+            }); 
+        })
+        .catch( error => {
+            responsesHandler.errorResponse({
+                res,
+                status: 400,
+                data: error,
+                message: 'There was an error while trying to delete your user.'
+            });
+        });
+};
+
 //* Exports
 module.exports = {
     getAllUsers,
     getUserById,
+    getMyUser,
     postNewUser,
     patchUser,
-    deleteUser
+    patchMyUser,
+    deleteUser,
+    deleteMyUser
 };
